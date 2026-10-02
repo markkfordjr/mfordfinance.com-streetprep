@@ -1,0 +1,9 @@
+{
+  "name": "streetprep-ai-mvp",
+  "version": "0.2.0",
+  "private": true,
+  "description": "Investment Banking Analyst interview prep MVP",
+  "scripts": {
+    "start": "node server.js"
+  }
+}

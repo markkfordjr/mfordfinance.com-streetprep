@@ -1,0 +1,384 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>StreetPrep AI — Investment Banking Analyst Prep</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=IBM+Plex+Mono:wght@500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <div class="app-shell">
+    <aside class="sidebar">
+      <div class="brand">
+        <div class="brand-mark">SP</div>
+        <div>
+          <div class="brand-name">StreetPrep AI</div>
+          <div class="brand-sub">Investment Banking Analyst</div>
+        </div>
+      </div>
+
+      <nav class="nav" aria-label="Primary navigation">
+        <button class="nav-item active" data-view="dashboard"><span>01</span>Dashboard</button>
+        <button class="nav-item" data-view="question-bank"><span>02</span>Question Bank</button>
+        <button class="nav-item" data-view="mock-interview"><span>03</span>Mock Interview</button>
+        <button class="nav-item" data-view="resume-lab"><span>04</span>Resume Lab</button>
+        <button class="nav-item" data-view="research"><span>05</span>Bank Profiles</button>
+      </nav>
+
+      <div class="sidebar-card">
+        <div class="eyebrow">Your readiness</div>
+        <div class="readiness-row"><strong id="sidebarScore">—</strong><span>/ 10</span></div>
+        <div class="progress"><div id="sidebarProgress"></div></div>
+        <p>Built from your practice history in this browser.</p>
+      </div>
+
+      <div class="sidebar-footer">MVP • Local-first demo</div>
+    </aside>
+
+    <main class="main">
+      <header class="topbar">
+        <div>
+          <div class="eyebrow">IB recruiting command center</div>
+          <h1 id="viewTitle">Dashboard</h1>
+        </div>
+        <div class="top-actions">
+          <div class="status-pill"><span class="status-dot"></span>Practice engine online</div>
+          <button class="ghost-btn" id="resetDataBtn">Reset local data</button>
+        </div>
+      </header>
+
+      <section class="view active" id="dashboard-view">
+        <div class="hero-grid">
+          <div class="hero-card">
+            <div class="eyebrow">Today's focus</div>
+            <h2>Train like the interview is already scheduled.</h2>
+            <p>Technical reps, firm-specific mock interviews, and resume feedback in one analyst-focused workspace.</p>
+            <div class="hero-actions">
+              <button class="primary-btn" data-jump="question-bank">Start technical round</button>
+              <button class="secondary-btn" data-jump="mock-interview">Run mock interview</button>
+            </div>
+          </div>
+          <div class="score-card">
+            <div class="eyebrow">Composite score</div>
+            <div class="big-score"><span id="dashboardScore">—</span><small>/10</small></div>
+            <div class="score-caption" id="dashboardScoreCaption">Complete a practice question to establish a baseline.</div>
+            <div class="mini-metrics">
+              <div><span id="metricQuestions">0</span><small>Questions</small></div>
+              <div><span id="metricInterviews">0</span><small>Mocks</small></div>
+              <div><span id="metricResume">0</span><small>Resume reviews</small></div>
+            </div>
+          </div>
+        </div>
+
+        <div class="section-title-row">
+          <div>
+            <div class="eyebrow">Core technicals</div>
+            <h3>Five pillars of analyst interviews</h3>
+          </div>
+        </div>
+        <div class="pillar-grid" id="pillarGrid"></div>
+
+        <div class="two-col lower-grid">
+          <div class="panel">
+            <div class="panel-header">
+              <div>
+                <div class="eyebrow">Recent performance</div>
+                <h3>Practice history</h3>
+              </div>
+              <button class="text-btn" data-jump="question-bank">Continue →</button>
+            </div>
+            <div id="recentHistory" class="history-list empty-state">No scored questions yet.</div>
+          </div>
+          <div class="panel">
+            <div class="panel-header">
+              <div>
+                <div class="eyebrow">Interview radar</div>
+                <h3>Firm profile sampler</h3>
+              </div>
+            </div>
+            <div id="firmSampler" class="firm-sampler"></div>
+          </div>
+        </div>
+      </section>
+
+      <section class="view" id="question-bank-view">
+        <div class="two-col qb-layout">
+          <div class="panel sticky-panel">
+            <div class="eyebrow">Round setup</div>
+            <h3>Technical Question Bank</h3>
+            <p class="muted">Questions rotate using local history, so recently seen prompts are deprioritized until the pool cycles.</p>
+
+            <label>Topic</label>
+            <select id="qbTopic">
+              <option value="mixed">Mixed technicals</option>
+              <option value="accounting">Accounting</option>
+              <option value="ma">M&A</option>
+              <option value="dcf">DCF</option>
+              <option value="threeStatement">3-Statement Model</option>
+              <option value="lbo">LBO</option>
+            </select>
+
+            <label>Difficulty</label>
+            <select id="qbDifficulty">
+              <option value="mixed">Mixed</option>
+              <option value="core">Core</option>
+              <option value="advanced">Advanced</option>
+            </select>
+
+            <label>Round length</label>
+            <select id="qbLength">
+              <option value="5">5 questions</option>
+              <option value="10" selected>10 questions</option>
+              <option value="15">15 questions</option>
+            </select>
+
+            <button class="primary-btn full" id="startRoundBtn">Generate rolling round</button>
+            <div class="tiny-note">Local demo grading uses a structured finance rubric. A production AI backend can replace it without changing the interface.</div>
+          </div>
+
+          <div class="panel qb-panel">
+            <div id="qbEmpty" class="center-empty">
+              <div class="empty-icon">∑</div>
+              <h3>Build a round to begin</h3>
+              <p>Select a topic, difficulty, and length. The engine will avoid repeating your most recent questions where possible.</p>
+            </div>
+            <div id="qbActive" class="hidden">
+              <div class="question-progress-row">
+                <div><span id="qCurrent">1</span> / <span id="qTotal">10</span></div>
+                <div id="qTopicBadge" class="tag">Accounting</div>
+                <div id="qDifficultyBadge" class="tag tag-muted">Core</div>
+              </div>
+              <div class="progress large"><div id="qProgressBar"></div></div>
+
+              <div class="question-card">
+                <div class="eyebrow">Interviewer</div>
+                <h2 id="questionText"></h2>
+              </div>
+
+              <label for="answerBox">Your answer</label>
+              <textarea id="answerBox" rows="9" placeholder="Answer like you're speaking to an associate or VP. Be concise, structured, and show the mechanics."></textarea>
+              <div class="answer-actions">
+                <span id="answerWordCount" class="muted">0 words</span>
+                <button class="primary-btn" id="submitAnswerBtn">Submit answer</button>
+              </div>
+
+              <div id="feedbackBox" class="feedback-box hidden">
+                <div class="feedback-score-wrap">
+                  <div class="score-ring"><span id="feedbackScore">0</span><small>/10</small></div>
+                  <div>
+                    <div class="eyebrow">Assessment</div>
+                    <h3 id="feedbackHeadline">Solid foundation</h3>
+                  </div>
+                </div>
+                <div class="feedback-grid">
+                  <div>
+                    <h4>What you covered</h4>
+                    <ul id="coveredList"></ul>
+                  </div>
+                  <div>
+                    <h4>What to improve</h4>
+                    <ul id="missingList"></ul>
+                  </div>
+                </div>
+                <div class="ideal-answer">
+                  <div class="eyebrow">Model answer</div>
+                  <p id="idealAnswerText"></p>
+                </div>
+                <button class="secondary-btn" id="nextQuestionBtn">Next question →</button>
+              </div>
+
+              <div id="roundSummary" class="round-summary hidden"></div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section class="view" id="mock-interview-view">
+        <div class="interview-setup" id="interviewSetup">
+          <div class="panel setup-main">
+            <div class="eyebrow">Live practice</div>
+            <h2>Build a bank-specific mock interview</h2>
+            <p class="muted">Profiles are modeled from recent candidate-reported patterns. They guide tone and topic weighting—not guaranteed interview scripts.</p>
+
+            <div class="form-grid">
+              <div>
+                <label>Firm</label>
+                <select id="firmSelect"></select>
+              </div>
+              <div>
+                <label>Interview type</label>
+                <select id="interviewType">
+                  <option value="hybrid">Hybrid</option>
+                  <option value="technical">Technical</option>
+                  <option value="behavioral">Behavioral / Fit</option>
+                </select>
+              </div>
+              <div>
+                <label>Length</label>
+                <select id="interviewLength">
+                  <option value="10">10 minutes</option>
+                  <option value="20" selected>20 minutes</option>
+                  <option value="30">30 minutes</option>
+                  <option value="45">45 minutes</option>
+                </select>
+              </div>
+              <div>
+                <label>Stage</label>
+                <select id="interviewStage">
+                  <option value="first">First round</option>
+                  <option value="superday">Superday</option>
+                  <option value="hirevue">HireVue / recorded screen</option>
+                </select>
+              </div>
+              <div>
+                <label>Candidate level</label>
+                <select id="candidateLevel">
+                  <option>Freshman</option>
+                  <option>Sophomore</option>
+                  <option selected>Junior</option>
+                  <option>Senior</option>
+                  <option>Graduated</option>
+                  <option>Master's</option>
+                  <option>MBA</option>
+                </select>
+              </div>
+              <div>
+                <label>Coverage / product focus</label>
+                <select id="coverageFocus">
+                  <option value="general">Generalist</option>
+                  <option value="ma">M&A</option>
+                  <option value="industrials">Industrials</option>
+                  <option value="tech">Technology</option>
+                  <option value="healthcare">Healthcare</option>
+                  <option value="fig">FIG</option>
+                  <option value="energy">Energy</option>
+                </select>
+              </div>
+            </div>
+
+            <div id="selectedFirmProfile" class="firm-profile-preview"></div>
+            <button class="primary-btn" id="startInterviewBtn">Enter interview room</button>
+          </div>
+          <div class="panel research-side">
+            <div class="eyebrow">Interview design</div>
+            <h3>What the simulator evaluates</h3>
+            <div class="criteria-stack">
+              <div><strong>Technical accuracy</strong><span>Mechanics, sequencing, assumptions</span></div>
+              <div><strong>Communication</strong><span>Concise, structured, banker-ready delivery</span></div>
+              <div><strong>Fit & motivation</strong><span>Why IB, why firm, resume narrative</span></div>
+              <div><strong>Pressure handling</strong><span>Follow-ups, corrections, mental math</span></div>
+              <div><strong>Executive presence</strong><span>Pacing, filler words, answer length</span></div>
+            </div>
+          </div>
+        </div>
+
+        <div class="interview-room hidden" id="interviewRoom">
+          <div class="video-grid">
+            <div class="video-card interviewer-card">
+              <div class="interviewer-avatar" id="interviewerAvatar">
+                <div class="avatar-face">IB</div>
+                <div class="voice-bars"><span></span><span></span><span></span><span></span></div>
+              </div>
+              <div class="video-label"><strong id="interviewerName">Interviewer</strong><span id="interviewerFirm">Firm</span></div>
+            </div>
+            <div class="video-card user-video-card">
+              <video id="userVideo" autoplay muted playsinline></video>
+              <div class="video-fallback" id="videoFallback">Camera preview</div>
+              <div class="video-label"><strong>You</strong><span id="mediaStatus">Camera off</span></div>
+            </div>
+          </div>
+
+          <div class="interview-console panel">
+            <div class="console-top">
+              <div>
+                <div class="eyebrow">Current question</div>
+                <h2 id="interviewQuestion"></h2>
+              </div>
+              <div class="timer" id="interviewTimer">20:00</div>
+            </div>
+            <textarea id="liveTranscript" rows="5" placeholder="Your spoken answer will appear here when browser speech recognition is available. You can also type your answer."></textarea>
+            <div class="console-actions">
+              <button class="secondary-btn" id="cameraBtn">Enable camera + mic</button>
+              <button class="secondary-btn" id="micBtn">Start speech capture</button>
+              <button class="primary-btn" id="answerInterviewBtn">Submit & continue</button>
+              <button class="danger-btn" id="endInterviewBtn">End interview</button>
+            </div>
+            <div id="speechSupportNote" class="tiny-note"></div>
+          </div>
+        </div>
+
+        <div class="panel hidden" id="interviewResults"></div>
+      </section>
+
+      <section class="view" id="resume-lab-view">
+        <div class="two-col resume-layout">
+          <div class="panel sticky-panel">
+            <div class="eyebrow">Candidate profile</div>
+            <h3>Resume Lab</h3>
+            <p class="muted">Upload a PDF/TXT or paste resume text. This demo extracts PDFs in-browser using PDF.js when available.</p>
+
+            <label>Current status</label>
+            <select id="studentStatus">
+              <option>Freshman</option>
+              <option>Sophomore</option>
+              <option>Junior</option>
+              <option>Senior</option>
+              <option selected>Graduated</option>
+              <option>Master's</option>
+              <option>MBA</option>
+            </select>
+
+            <label>Target</label>
+            <select id="resumeTarget">
+              <option>Investment Banking Analyst</option>
+              <option>Investment Banking Summer Analyst</option>
+              <option>M&A Analyst</option>
+              <option>Corporate Finance / FP&A</option>
+              <option>Private Equity Analyst</option>
+            </select>
+
+            <label>Resume file</label>
+            <input id="resumeFile" type="file" accept=".pdf,.txt,text/plain,application/pdf" />
+            <div id="fileStatus" class="tiny-note">No file selected.</div>
+
+            <label>Or paste resume text</label>
+            <textarea id="resumeText" rows="12" placeholder="Paste the full resume here for the most reliable demo analysis."></textarea>
+
+            <button class="primary-btn full" id="analyzeResumeBtn">Analyze for IB recruiting</button>
+          </div>
+
+          <div class="panel resume-results-panel">
+            <div id="resumeEmpty" class="center-empty">
+              <div class="empty-icon">CV</div>
+              <h3>No resume analysis yet</h3>
+              <p>You'll get recruiting-readiness feedback, gaps, bullet-level suggestions, and concrete projects to build evidence for missing skills.</p>
+            </div>
+            <div id="resumeResults" class="hidden"></div>
+          </div>
+        </div>
+      </section>
+
+      <section class="view" id="research-view">
+        <div class="section-title-row">
+          <div>
+            <div class="eyebrow">Research-backed calibration</div>
+            <h2>Bank interview profiles</h2>
+            <p class="muted max-copy">These profiles summarize recent candidate-reported tendencies across interview-review sites and communities. Actual processes vary by office, group, seniority, and recruiting cycle.</p>
+          </div>
+        </div>
+        <div class="bank-grid" id="bankGrid"></div>
+        <div class="panel source-note">
+          <div class="eyebrow">Methodology note</div>
+          <p>Firm settings are intentionally treated as weighted tendencies rather than exact scripts. The strongest recurring patterns are used to shift question mix, pressure level, follow-up depth, and behavioral vs. technical emphasis.</p>
+        </div>
+      </section>
+    </main>
+  </div>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/4.10.38/pdf.min.mjs" type="module" id="pdfjsModule"></script>
+  <script src="app.js"></script>
+</body>
+</html>
